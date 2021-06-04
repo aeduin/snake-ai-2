@@ -9,7 +9,7 @@ empty_channel = 3
 space_type = torch.int16
 
 class World():
-    def __init__(self, width: int, height: int, num_worlds: int, device):
+    def __init__(self, width: int, height: int, num_worlds: int, device: torch.device):
         self.device = device
         self.size = torch.Tensor([width, height]).to(device)
         self.num_worlds = num_worlds
@@ -19,7 +19,7 @@ class World():
         self.snake_head_x = torch.Tensor([center_x - 1]).to(device, torch.long).repeat(num_worlds)
         self.snake_head_y = torch.Tensor([center_y]).to(device, torch.long).repeat(num_worlds)
         self.snake_size = torch.Tensor([2]).to(device, torch.long).repeat(num_worlds)
-        self.dead = torch.Tensor([False]).to(device, bool).repeat(num_worlds)
+        self.dead = torch.Tensor([False]).to(device, torch.bool).repeat(num_worlds)
         # print('self.snake_head', self.snake_head_x, self.snake_head_y)
 
         self.space = torch.zeros((num_worlds, num_channels, width, height)).to(device, space_type)
@@ -83,7 +83,7 @@ class World():
         # print(reduce_time.shape)
         # print(self.space[decrease_time][snake_channel].shape)
         # print((self.space[decrease_time][snake_channel, :, :] > 0).shape)
-        selected = torch.zeros(self.space.shape, device=self.device, dtype=bool)
+        selected = torch.zeros(self.space.shape, device=self.device, dtype=torch.bool)
         selected[decrease_time, snake_channel] = self.space[decrease_time, snake_channel, :, :] > 0
         # print(selected)
         print('space shape', self.space.shape)
