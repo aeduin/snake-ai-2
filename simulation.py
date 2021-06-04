@@ -41,13 +41,15 @@ class World():
         # Calculate the new position of the head
         new_head_x = self.snake_head_x + move_x * (1 - self.dead.to(space_type))
         new_head_y = self.snake_head_y + move_y * (1 - self.dead.to(space_type))
+
+        # print(new_head_x.to('cpu').numpy()[0])
  
         self.dead = torch.logical_or(torch.logical_or(torch.logical_or(torch.logical_or(
                 self.dead,
                 new_head_x < 0),
-                new_head_x >= self.size[0]),
+                new_head_x >= self.width),
                 new_head_y < 0),
-                new_head_y >= self.size[1])
+                new_head_y >= self.height)
 
         alive = torch.logical_not(self.dead)
 
@@ -67,7 +69,6 @@ class World():
 
         # The time until a piece of the snake disappears decreases by 1 if it has eaten no food, or by 0 if it has
         # reduce_time = eat_food - 1
-        should_decrease_tail = torch.logical_not(eat_food)
         
         decrease_snake_tail = torch.zeros((self.num_worlds, num_channels, self.width, self.height), device=self.device, dtype=torch.bool)
 
@@ -101,11 +102,10 @@ class World():
 
     def place_food(self, new_food_required):
         has_no_snake = self.space[:, snake_channel, :, :] == 0
-        print(has_no_snake)
+
         num_locations = has_no_snake.to(dtype=torch.long)
         num_locations = torch.sum(num_locations, dim=1)
         num_locations = torch.sum(num_locations, dim=1)
-        print(num_locations)
 
         selected_locations = (
             torch.rand((self.num_worlds,), device=self.device)
@@ -159,6 +159,25 @@ if __name__ == "__main__":
     device = torch.device("cuda:0")
     # device = torch.device("cpu")
 
+    num_worlds = 256
+
+
+    w = World(10, 10, num_worlds, device)
+    actions_x = torch.tensor([1], dtype=torch.long, device=device).repeat(num_worlds)
+    actions_y = torch.tensor([0], dtype=torch.long, device=device).repeat(num_worlds)
+
+    from time import perf_counter
+    
+    start = perf_counter()
+
+    for i in range(16 * 64):
+        w.step(actions_x, actions_y)
+
+    w_space = w.space.cpu()
+
+    print(perf_counter() - start)
+
+    exit()
     num_worlds = 4
 
     w = World(10, 10, num_worlds, device)
