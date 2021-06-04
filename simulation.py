@@ -100,12 +100,12 @@ class World():
 if __name__ == "__main__":
     device = torch.device("cuda:0")
     # device = torch.device("cpu")
-    w = World(10, 10, device)
+    w = World(10, 10, 5, device)
 
     # for i in range(1000):
     #     for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
     #         w.step(dx, dy)
     for i in range(5):
-        w.step(1, 0)
+        w.step(torch.tensor([1]), torch.tensor([0]))
         print(w)
         input()
