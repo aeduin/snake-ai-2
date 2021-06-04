@@ -11,7 +11,7 @@ space_type = torch.int16
 class World():
     def __init__(self, width: int, height: int, num_worlds: int, device: torch.device):
         self.device = device
-        self.size = torch.Tensor([width, height]).to(device)
+        self.size = torch.tensor([width, height]).to(device)
         self.width = width
         self.height = height
         self.num_worlds = num_worlds
@@ -22,10 +22,10 @@ class World():
 
         center_x = width // 2
         center_y = width // 2
-        self.snake_head_x = torch.Tensor([center_x - 1]).to(device, torch.long).repeat(num_worlds)
-        self.snake_head_y = torch.Tensor([center_y]).to(device, torch.long).repeat(num_worlds)
-        self.snake_size = torch.Tensor([2]).to(device, torch.long).repeat(num_worlds)
-        self.dead = torch.Tensor([False]).to(device, torch.bool).repeat(num_worlds)
+        self.snake_head_x = torch.tensor([center_x - 1]).to(device, torch.long).repeat(num_worlds)
+        self.snake_head_y = torch.tensor([center_y]).to(device, torch.long).repeat(num_worlds)
+        self.snake_size = torch.tensor([2]).to(device, torch.long).repeat(num_worlds)
+        self.dead = torch.tensor([False]).to(device, torch.bool).repeat(num_worlds)
         # print('self.snake_head', self.snake_head_x, self.snake_head_y)
 
         self.space = torch.zeros((num_worlds, num_channels, width, height)).to(device, space_type)
@@ -166,8 +166,8 @@ class World():
         return result
 
 if __name__ == "__main__":
-    # device = torch.device("cuda:0")
-    device = torch.device("cpu")
+    device = torch.device("cuda:0")
+    # device = torch.device("cpu")
 
     num_worlds = 3
 
@@ -179,6 +179,6 @@ if __name__ == "__main__":
     print(w)
     input()
     for i in range(7):
-        w.step(torch.Tensor([1, 0, 0], device=device).to(torch.long), torch.Tensor([0, 1, -1], device=device).to(torch.long))
+        w.step(torch.tensor([1, 0, 0], device=device).to(torch.long), torch.tensor([0, 1, -1], device=device).to(torch.long))
         print(w)
         input()
