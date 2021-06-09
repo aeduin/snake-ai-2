@@ -79,7 +79,7 @@ for episode_nr in range(episodes_count):
             actions_weight[:, alive] = model.softmax(rewards_transpose)
 
 
-            actions_weight += torch.rand(4, world.num_worlds, device=world.device) * model.temperature
+            actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
             actions_weight[impossible_large] = -100
 
             taken_action_idx = torch.argmax(actions_weight, dim=0)
@@ -94,14 +94,17 @@ for episode_nr in range(episodes_count):
             
             n_steps += 1
 
-            if n_steps >= 20_000 and torch.sum(world.dead).cpu() <= n_worlds / 100 + 1:
+            if n_steps >= 10_000 and torch.sum(world.dead).cpu() <= n_worlds / 100 + 1:
                 break
 
-            reward = torch.zeros(n_worlds)
+            if n_steps >= 20_000:
+                break
 
-            experience.append((network_input, alive, reward, taken_action_idx, torch.max(predicted_rewards, dim=1).values, reward))
+            experience.append((network_input, alive, reward, taken_action_idx, torch.max(predicted_rewards, dim=1).values))
 
             # print(len(experience), ':', torch.sum(world.dead))
+
+    print('n_steps =', n_steps)
 
     print('avg reward:', total_reward.cpu().numpy()[0] / world.num_worlds)
 
@@ -110,21 +113,30 @@ for episode_nr in range(episodes_count):
     total_loss = 0
     steps = 0
 
+    goals = [torch.zeros(n_worlds, dtype=torch.float, device=device)]
+
+    for _, _, has_reward, _, _ in experience:
+        goals.append(goals[-1] + has_reward)
+
+    print(torch.sum(goals[-1]) / n_worlds)
+
     for i in range(len(experience) - 1):
         network_input, alive, reward, taken_action_idx, _ = experience[i]
-        _, next_alive, _, _, max_predicted_next = experience[i + 1]
+        # _, next_alive, _, _, max_predicted_next = experience[i + 1]
 
-        next_reward = torch.zeros(n_worlds, device=device)
-        next_reward[next_alive] = max_predicted_next
-        next_reward = next_reward[alive]
-        next_reward += reward[alive]
+        # next_reward = torch.zeros(n_worlds, device=device)
+        # next_reward[next_alive] = max_predicted_next
+        # next_reward = next_reward[alive]
+        # next_reward += reward[alive]
+
+        goal = goals[-(i + 1)][alive]
 
         optimizer.zero_grad()
 
         # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
         predicted_rewards = model(network_input)[torch.arange(0, network_input.shape[0]), taken_action_idx[alive]]
 
-        loss = predicted_rewards - next_reward
+        loss = predicted_rewards - goal
 
         loss = torch.sum(loss * loss)
         loss.backward()

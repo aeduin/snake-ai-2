@@ -188,7 +188,7 @@ class CnnAi(nn.Module):
     def __init__(self, world: World):
         super(CnnAi, self).__init__()
 
-        self.temperature = 0.05
+        self.temperature = 0.1
         device = world.device
         
 
