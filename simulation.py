@@ -100,6 +100,8 @@ class World():
         self.snake_head_x = new_head_x
         self.snake_head_y = new_head_y
 
+        return eat_food
+
     def place_food(self, new_food_required):
         has_no_snake = self.space[:, snake_channel, :, :] == 0
 
@@ -158,7 +160,7 @@ class World():
 if __name__ == "__main__":
     device = torch.device("cuda:0")
     # device = torch.device("cpu")
-
+    """
     num_worlds = 256
 
 
@@ -178,6 +180,8 @@ if __name__ == "__main__":
     print(perf_counter() - start)
 
     exit()
+    """
+
     num_worlds = 4
 
     w = World(10, 10, num_worlds, device)
