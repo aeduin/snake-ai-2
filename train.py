@@ -5,16 +5,16 @@ import simulation
 from simulation import World
 from models import CnnAi
 
-device = torch.device('cuda:0')
-
 n_worlds = 256
+episodes_count = 500
+learning_rate = 0.001
+
+device = torch.device('cuda:0')
 world = World(10, 10, n_worlds, device)
 model = CnnAi(world)
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-
-episodes_count = 100
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
@@ -106,7 +106,7 @@ for episode_nr in range(episodes_count):
 
     print('n_steps =', n_steps)
 
-    print('avg reward:', total_reward.cpu().numpy()[0] / world.num_worlds)
+    print('\tavg reward:', total_reward.cpu().numpy()[0] / world.num_worlds)
 
     model.train()
 
@@ -129,7 +129,7 @@ for episode_nr in range(episodes_count):
         # next_reward = next_reward[alive]
         # next_reward += reward[alive]
 
-        goal = goals[-(i + 1)][alive]
+        goal = (goals[-(i + 1)][alive] > 0).to(torch.float)
 
         optimizer.zero_grad()
 

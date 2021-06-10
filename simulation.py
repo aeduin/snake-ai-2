@@ -8,6 +8,8 @@ empty_channel = 3
 
 space_type = torch.int16
 
+initial_snake_size = 4
+
 class World():
     def __init__(self, width: int, height: int, num_worlds: int, device: torch.device):
         self.device = device
@@ -24,14 +26,14 @@ class World():
         center_y = width // 2
         self.snake_head_x = torch.tensor([center_x - 1]).to(device, torch.long).repeat(num_worlds)
         self.snake_head_y = torch.tensor([center_y]).to(device, torch.long).repeat(num_worlds)
-        self.snake_size = torch.tensor([2]).to(device, torch.long).repeat(num_worlds)
+        self.snake_size = torch.tensor([initial_snake_size]).to(device, torch.long).repeat(num_worlds)
         self.dead = torch.tensor([False]).to(device, torch.bool).repeat(num_worlds)
 
         self.space = torch.zeros((num_worlds, num_channels, width, height)).to(device, space_type)
 
         self.space[self.all_worlds_tensor, snake_head_channel, self.snake_head_x, self.snake_head_y] = 1
-        self.space[self.all_worlds_tensor, snake_channel,      self.snake_head_x, self.snake_head_y] = 2
-        self.space[self.all_worlds_tensor, snake_channel,      self.snake_head_x - 1, self.snake_head_y] = 1
+        self.space[self.all_worlds_tensor, snake_channel,      self.snake_head_x, self.snake_head_y] = initial_snake_size
+        # self.space[self.all_worlds_tensor, snake_channel,      self.snake_head_x - 1, self.snake_head_y] = 1
         # self.space[:, snake_channel, self.snake_head_x, self.snake_head_y + 1] = 1
         # self.place_food(1)
 

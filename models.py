@@ -204,6 +204,7 @@ class CnnAi(nn.Module):
 
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
+        self.sigmoid = nn.Sigmoid()
 
          
         self.actions_cpu = [(0, 1), (-1, 0), (0, -1), (1, 0)]
@@ -230,6 +231,7 @@ class CnnAi(nn.Module):
         
         y = self.dense(y)
         # y = self.softmax(y)
+        y = self.sigmoid(y)
 
         return y
 
