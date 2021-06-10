@@ -194,13 +194,13 @@ class CnnAi(nn.Module):
 
         self.world_size = (world.width, world.height)
         size = torch.tensor(self.world_size)
-        self.conv1 = nn.Conv2d(simulation.num_channels, 8, (5, 5)).to(device)
+        self.conv1 = nn.Conv2d(simulation.num_channels, 8 * 2, (5, 5)).to(device)
         size = (size - 4)
-        self.conv2 = nn.Conv2d(8, 12, (3, 3)).to(device)
+        self.conv2 = nn.Conv2d(8 * 2, 12 * 2, (3, 3)).to(device)
         size = (size - 2)
-        self.conv3 = nn.Conv2d(12, 16, (3, 3)).to(device)
+        self.conv3 = nn.Conv2d(12 * 2, 16 * 2, (3, 3)).to(device)
         size = (size - 2)
-        self.dense = nn.Linear(int(size[0] * size[1] * 16), 4).to(device)
+        self.dense = nn.Linear(int(size[0] * size[1] * 16 * 2), 4).to(device)
 
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)

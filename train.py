@@ -7,14 +7,14 @@ from models import CnnAi
 
 n_worlds = 256
 episodes_count = 500
-learning_rate = 0.001
+learning_rate = 0.00003
 
 device = torch.device('cuda:0')
 world = World(10, 10, n_worlds, device)
 model = CnnAi(world)
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
@@ -110,9 +110,6 @@ for episode_nr in range(episodes_count):
 
     model.train()
 
-    total_loss = 0
-    steps = 0
-
     goals = [torch.zeros(n_worlds, dtype=torch.float, device=device)]
 
     for _, _, has_reward, _, _ in experience:
@@ -120,33 +117,38 @@ for episode_nr in range(episodes_count):
 
     print(torch.sum(goals[-1]) / n_worlds)
 
-    for i in range(len(experience) - 1):
-        network_input, alive, reward, taken_action_idx, _ = experience[i]
-        # _, next_alive, _, _, max_predicted_next = experience[i + 1]
+    for j in range(20):
+        total_loss = 0
+        steps = 0
 
-        # next_reward = torch.zeros(n_worlds, device=device)
-        # next_reward[next_alive] = max_predicted_next
-        # next_reward = next_reward[alive]
-        # next_reward += reward[alive]
 
-        goal = (goals[-(i + 1)][alive] > 0).to(torch.float)
+        for i in range(len(experience) - 1):
+            network_input, alive, reward, taken_action_idx, _ = experience[i]
+            # _, next_alive, _, _, max_predicted_next = experience[i + 1]
 
-        optimizer.zero_grad()
+            # next_reward = torch.zeros(n_worlds, device=device)
+            # next_reward[next_alive] = max_predicted_next
+            # next_reward = next_reward[alive]
+            # next_reward += reward[alive]
 
-        # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
-        predicted_rewards = model(network_input)[torch.arange(0, network_input.shape[0]), taken_action_idx[alive]]
+            goal = (goals[-(i + 1)][alive] > 0).to(torch.float)
 
-        loss = predicted_rewards - goal
+            optimizer.zero_grad()
 
-        loss = torch.sum(loss * loss)
-        loss.backward()
+            # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
+            predicted_rewards = model(network_input)[torch.arange(0, network_input.shape[0]), taken_action_idx[alive]]
 
-        optimizer.step()
+            loss = predicted_rewards - goal
 
-        total_loss += loss.item()
-        steps += network_input.shape[0]
+            loss = torch.sum(loss * loss)
+            loss.backward()
 
-    print('loss =', total_loss / steps)       
+            optimizer.step()
+
+            total_loss += loss.item()
+            steps += network_input.shape[0]
+
+        print('loss =', total_loss / steps)       
 
 
 
