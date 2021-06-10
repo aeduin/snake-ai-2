@@ -7,14 +7,14 @@ from models import CnnAi
 
 n_worlds = 256
 episodes_count = 500
-learning_rate = 0.001
+learning_rate = 0.00003
 
 device = torch.device('cuda:0')
 world = World(10, 10, n_worlds, device)
 model = CnnAi(world)
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
