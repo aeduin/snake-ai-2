@@ -5,6 +5,8 @@ import simulation
 from simulation import World
 from models import CnnAi
 
+import datetime
+
 n_worlds = 256
 episodes_count = 500
 learning_rate = 0.00003
@@ -15,6 +17,7 @@ model = CnnAi(world)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.7)
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
@@ -76,7 +79,7 @@ for episode_nr in range(episodes_count):
 
             actions_weight = torch.zeros((4, world.num_worlds), device=device)
             
-            actions_weight[:, alive] = model.softmax(rewards_transpose)
+            actions_weight[:, alive] = (rewards_transpose)
 
 
             actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
@@ -147,6 +150,16 @@ for episode_nr in range(episodes_count):
         steps += network_input.shape[0]
 
     print('loss =', total_loss / steps)       
+
+    if (episode_nr + 1) % 10 == 0:
+        save_dict = model.state_dict()
+        now = datetime.datetime.now()
+        torch.save(save_dict, 'model_' + str(now))
+
+        if episode_nr < 75:
+            lr_scheduler.step()
+
+        
 
 
 
