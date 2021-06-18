@@ -25,7 +25,7 @@ model = CnnAi(world)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
-lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.7)
+lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)
@@ -201,7 +201,7 @@ for episode_nr in range(episodes_count):
         plt.savefig('graph_output/avg_loss_' + script_start)
         plt.clf()
 
-        if episode_nr < 75:
+        if episode_nr < 72:
             lr_scheduler.step()
 
         
