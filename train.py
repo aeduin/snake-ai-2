@@ -32,12 +32,12 @@ rewards = []
 
 def running_avg(ls):
     result = []
-    for end in range(len(ls) + 1):
+    for end in range(1, len(ls) + 1):
         start = max(0, end - 10)
         total = 0
         for i in range(start, end):
             total += ls[i]
-        result.append(total / (end - start + 1))
+        result.append(total / (end - start))
 
     return result
 
