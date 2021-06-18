@@ -65,7 +65,7 @@ for episode_nr in range(episodes_count):
             rewards_transpose = predicted_rewards.transpose(1, 0)
             
             # Don't take an action that results in certain death
-            possible = torch.zeros((4, world.num_worlds), device=world.device, dtype=torch.bool)
+            possible = torch.zeros((4, world.num_worlds), device=device, dtype=torch.bool)
 
             for i in range(4):
                 dx, dy = model.actions_cpu[i]
@@ -79,7 +79,7 @@ for episode_nr in range(episodes_count):
                     new_head_y >= world.size[1])
                 )
 
-                current_possible_large = torch.zeros((world.num_worlds,), device=world.device, dtype=torch.bool)
+                current_possible_large = torch.zeros((world.num_worlds,), device=device, dtype=torch.bool)
                 current_possible_large[alive] = current_possible
 
                 # alive_and_possible = alive[:]
@@ -100,6 +100,7 @@ for episode_nr in range(episodes_count):
             impossible = torch.logical_not(possible[:, alive]).transpose(1, 0)
             impossible_large = torch.logical_not(possible).transpose(1, 0)
 
+            predicted_rewards += torch.rand(world.num_worlds, 4, device=device) * 0.01
             predicted_rewards[impossible] = -100
 
             actions_weight = torch.zeros((world.num_worlds, 4), device=device)
@@ -107,9 +108,9 @@ for episode_nr in range(episodes_count):
             actions_weight[alive] = predicted_rewards # torch.softmax(predicted_rewards, dim=1)
 
 
-            # actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
-            randomize = torch.rand(world.num_worlds, device=world.device) < model.temperature
-            actions_weight[randomize] = torch.rand(world.num_worlds, 4, device=world.device)[randomize]
+            # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
+            randomize = torch.rand(world.num_worlds, device=device) < model.temperature
+            actions_weight[randomize] = torch.rand(world.num_worlds, 4, device=device)[randomize]
             actions_weight[impossible_large] = -100
 
             taken_action_idx = torch.argmax(actions_weight, dim=1)
