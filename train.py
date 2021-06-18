@@ -116,14 +116,17 @@ for episode_nr in range(episodes_count):
     total_loss = 0
     steps = 0
 
-    goals = [torch.zeros(n_worlds, dtype=torch.float, device=device)]
+    goals = [torch.zeros(0)] * (len(experience)) + [torch.zeros(n_worlds, dtype=torch.float, device=device)]
+    reward_decrease_factor = 0.96
 
-    for _, _, has_reward, _, _ in experience:
-        goals.append(goals[-1] + has_reward)
+    for turn_nr in range(len(experience) - 1, -1, -1):
+        _, _, has_reward, _, _ = experience[turn_nr]
+        goals[turn_nr] = goals[turn_nr + 1] * reward_decrease_factor + has_reward
+        # goals.append(goals[-1] * reward_decrease_factor + has_reward)
 
-    print(torch.sum(goals[-1]) / n_worlds)
+    print(torch.sum(goals[0]) / n_worlds)
 
-    for i in range(len(experience) - 1):
+    for i in range(len(experience)):
         network_input, alive, reward, taken_action_idx, _ = experience[i]
         # _, next_alive, _, _, max_predicted_next = experience[i + 1]
 
@@ -132,7 +135,7 @@ for episode_nr in range(episodes_count):
         # next_reward = next_reward[alive]
         # next_reward += reward[alive]
 
-        goal = (goals[-(i + 1)][alive] > 0).to(torch.float)
+        goal = goals[i][alive] # (goals[-(i + 1)][alive] > 0).to(torch.float)
 
         optimizer.zero_grad()
 

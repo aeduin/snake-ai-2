@@ -231,7 +231,8 @@ class CnnAi(nn.Module):
         
         y = self.dense(y)
         # y = self.softmax(y)
-        y = self.sigmoid(y)
+        # y = self.sigmoid(y)
+        y = self.relu(y)
 
         return y
 
