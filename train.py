@@ -79,7 +79,7 @@ for episode_nr in range(episodes_count):
 
             actions_weight = torch.zeros((4, world.num_worlds), device=device)
             
-            actions_weight[:, alive] = (rewards_transpose)
+            actions_weight[:, alive] = torch.softmax(rewards_transpose, dim=0)
 
 
             actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
