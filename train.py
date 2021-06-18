@@ -100,12 +100,13 @@ for episode_nr in range(episodes_count):
             impossible = torch.logical_not(possible[:, alive]).transpose(1, 0)
             impossible_large = torch.logical_not(possible).transpose(1, 0)
 
-            predicted_rewards += torch.rand(world.num_worlds, 4, device=device)[alive] * 0.01
             predicted_rewards[impossible] = -100
 
             actions_weight = torch.zeros((world.num_worlds, 4), device=device)
             
-            actions_weight[alive] = predicted_rewards # torch.softmax(predicted_rewards, dim=1)
+            # actions_weight[alive] = predicted_rewards
+            actions_weight[alive] = torch.softmax(predicted_rewards, dim=1)
+            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.01
 
 
             # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
