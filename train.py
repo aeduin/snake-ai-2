@@ -16,8 +16,8 @@ print('start time:', script_start)
 n_worlds = 128
 episodes_count = 500
 learning_rate = 0.000003
-world_width = 10
-world_height = 10
+world_width = 7
+world_height = 7
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
