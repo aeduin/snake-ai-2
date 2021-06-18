@@ -24,7 +24,7 @@ world = World(world_width, world_height, n_worlds, device)
 model = CnnAi(world)
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
 plt.figure(0)
@@ -97,20 +97,22 @@ for episode_nr in range(episodes_count):
                 possible[i, :] = current_possible_large
             
             possible_transpose = possible[:, alive].transpose(1, 0)
-            impossible = torch.logical_not(possible[:, alive])
-            impossible_large = torch.logical_not(possible)
+            impossible = torch.logical_not(possible[:, alive]).transpose(1, 0)
+            impossible_large = torch.logical_not(possible).transpose(1, 0)
 
-            rewards_transpose[impossible] = -100
+            predicted_rewards[impossible] = -100
 
-            actions_weight = torch.zeros((4, world.num_worlds), device=device)
+            actions_weight = torch.zeros((world.num_worlds, 4), device=device)
             
-            actions_weight[:, alive] = torch.softmax(rewards_transpose, dim=0)
+            actions_weight[alive] = predicted_rewards # torch.softmax(predicted_rewards, dim=1)
 
 
-            actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
+            # actions_weight += torch.randn(4, world.num_worlds, device=world.device) * model.temperature
+            randomize = torch.rand(world.num_worlds, device=world.device) < model.temperature
+            actions_weight[randomize] = torch.rand(world.num_worlds, 4, device=world.device)[randomize]
             actions_weight[impossible_large] = -100
 
-            taken_action_idx = torch.argmax(actions_weight, dim=0)
+            taken_action_idx = torch.argmax(actions_weight, dim=1)
 
             dx = model.actions_x[taken_action_idx]
             dy = model.actions_y[taken_action_idx]
@@ -122,10 +124,11 @@ for episode_nr in range(episodes_count):
             
             n_steps += 1
 
-            if n_steps >= 10_000 and torch.sum(world.dead).cpu() <= n_worlds / 100 + 1:
-                break
+            # if n_steps >= 10_000 and torch.sum(world.dead).cpu() <= n_worlds / 100 + 1:
+                # break
 
-            if n_steps >= 20_000:
+            if n_steps >= 5_000:
+                print('worlds left:', world.num_worlds - torch.sum(world.dead).item())
                 break
 
             experience.append((network_input, alive, reward, taken_action_idx, torch.max(predicted_rewards, dim=1).values))
