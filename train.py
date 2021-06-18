@@ -6,10 +6,15 @@ from simulation import World
 from models import CnnAi
 
 import datetime
+import os
 
-n_worlds = 256
+from matplotlib import pyplot as plt
+
+script_start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+n_worlds = 128
 episodes_count = 500
-learning_rate = 0.00003
+learning_rate = 0.000003
 
 device = torch.device('cuda:0')
 world = World(10, 10, n_worlds, device)
@@ -18,6 +23,23 @@ model = CnnAi(world)
 criterion = nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.7)
+
+plt.figure(0)
+os.makedirs('./graph_output/', exist_ok=True)
+os.makedirs('./model_output/', exist_ok=True)
+losses = []
+rewards = []
+
+def running_avg(ls):
+    result = []
+    for end in range(len(ls) + 1):
+        start = max(0, end - 10)
+        total = 0
+        for i in range(start, end):
+            total += ls[i]
+        result.append(total / (end - start + 1))
+
+    return result
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
@@ -109,7 +131,9 @@ for episode_nr in range(episodes_count):
 
     print('n_steps =', n_steps)
 
-    print('\tavg reward:', total_reward.cpu().numpy()[0] / world.num_worlds)
+    avg_reward = total_reward.item() / world.num_worlds
+    print('\tavg reward:', avg_reward)
+    rewards.append(avg_reward)
 
     model.train()
 
@@ -124,7 +148,7 @@ for episode_nr in range(episodes_count):
         goals[turn_nr] = goals[turn_nr + 1] * reward_decrease_factor + has_reward
         # goals.append(goals[-1] * reward_decrease_factor + has_reward)
 
-    print(torch.sum(goals[0]) / n_worlds)
+    # print(torch.sum(goals[0]) / n_worlds)
 
     for i in range(len(experience)):
         network_input, alive, reward, taken_action_idx, _ = experience[i]
@@ -148,16 +172,31 @@ for episode_nr in range(episodes_count):
         loss.backward()
 
         optimizer.step()
-
+        
         total_loss += loss.item()
         steps += network_input.shape[0]
 
-    print('loss =', total_loss / steps)       
+
+    avg_loss = total_loss / steps
+    print('loss =', avg_loss)
+    losses.append(avg_loss)
 
     if (episode_nr + 1) % 10 == 0:
         save_dict = model.state_dict()
         now = datetime.datetime.now()
-        torch.save(save_dict, 'model_' + str(now))
+        torch.save(save_dict, 'model_output/model_' + str(now))
+
+        plt.plot(rewards)
+        plt.plot(running_avg(rewards))
+
+        plt.savefig('graph_output/avg_reward_' + script_start)
+        plt.clf()
+
+        plt.plot(losses)
+        plt.plot(running_avg(losses))
+
+        plt.savefig('graph_output/avg_loss_' + script_start)
+        plt.clf()
 
         if episode_nr < 75:
             lr_scheduler.step()
