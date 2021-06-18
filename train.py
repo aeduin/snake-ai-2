@@ -11,13 +11,16 @@ import os
 from matplotlib import pyplot as plt
 
 script_start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+print('start time:', script_start)
 
 n_worlds = 128
 episodes_count = 500
 learning_rate = 0.000003
+world_width = 10
+world_height = 10
 
 device = torch.device('cuda:0')
-world = World(10, 10, n_worlds, device)
+world = World(world_width, world_height, n_worlds, device)
 model = CnnAi(world)
 
 criterion = nn.MSELoss()
@@ -43,7 +46,7 @@ def running_avg(ls):
 
 for episode_nr in range(episodes_count):
     print('start episode', episode_nr)
-    world = World(10, 10, n_worlds, device)
+    world = World(world_width, world_height, n_worlds, device)
 
     experience = []
 
