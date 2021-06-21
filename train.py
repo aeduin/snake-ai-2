@@ -14,8 +14,8 @@ script_start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 print('start time:', script_start)
 
 n_worlds = 128
-episodes_count = 1000
-learning_rate = 0.000003
+episodes_count = 1500
+learning_rate = 0.000001
 world_width = 7
 world_height = 7
 max_steps = 5_000
@@ -204,9 +204,9 @@ for episode_nr in range(episodes_count):
     losses.append(avg_loss)
 
     if (episode_nr + 1) % 10 == 0:
-        save_dict = model.state_dict()
         now = datetime.datetime.now()
-        torch.save(save_dict, 'model_output/model_' + str(now))
+        torch.save(model.state_dict(), 'model_output/model_' + script_start + '_'  + str(episode_nr))
+        torch.save(optimizer.state_dict(), 'model_output/optimizer_' + script_start + '_'  + str(episode_nr))
 
         plt.plot(rewards)
         plt.plot(running_avg(rewards))
