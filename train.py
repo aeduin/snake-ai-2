@@ -18,6 +18,7 @@ episodes_count = 1500
 learning_rate = 0.000001
 world_width = 7
 world_height = 7
+max_steps = 5_000
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
@@ -129,7 +130,7 @@ for episode_nr in range(episodes_count):
             # if n_steps >= 10_000 and torch.sum(world.dead).cpu() <= n_worlds / 100 + 1:
                 # break
 
-            if n_steps >= 5_000:
+            if n_steps >= max_steps:
                 print('worlds left:', world.num_worlds - torch.sum(world.dead).item())
                 break
 
@@ -149,11 +150,15 @@ for episode_nr in range(episodes_count):
     steps = 0
 
     goals = [torch.zeros(0)] * (len(experience)) + [torch.zeros(n_worlds, dtype=torch.float, device=device)]
+    _, alive_end, reward_end, _, _ = experience[-1]
+    reached_end = [torch.zeros(0)] * len(experience) + [alive_end]
     reward_decrease_factor = 0.96
 
     for turn_nr in range(len(experience) - 1, -1, -1):
-        _, _, has_reward, _, _ = experience[turn_nr]
+        _, alive, has_reward, _, _ = experience[turn_nr]
         goals[turn_nr] = goals[turn_nr + 1] * reward_decrease_factor + has_reward
+        reached_end[turn_nr] = torch.logical_and(reached_end[turn_nr + 1], torch.logical_not(has_reward))
+        
         # goals.append(goals[-1] * reward_decrease_factor + has_reward)
 
     # print(torch.sum(goals[0]) / n_worlds)
@@ -167,12 +172,21 @@ for episode_nr in range(episodes_count):
         # next_reward = next_reward[alive]
         # next_reward += reward[alive]
 
-        goal = goals[i][alive] # (goals[-(i + 1)][alive] > 0).to(torch.float)
+        select_for_learning_large = torch.logical_and(torch.logical_not(reached_end[i]), alive)
+        if torch.sum(select_for_learning_large).item() == 0:
+            continue
+        select_for_learning_small = select_for_learning_large[alive]
+        selected_network_input = network_input[select_for_learning_small]
+
+        goal = goals[i][select_for_learning_large] # (goals[-(i + 1)][alive] > 0).to(torch.float)
 
         optimizer.zero_grad()
 
         # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
-        predicted_rewards = model(network_input)[torch.arange(0, network_input.shape[0]), taken_action_idx[alive]]
+        predicted_rewards = model(selected_network_input)[
+            torch.arange(0, selected_network_input.shape[0]),
+            taken_action_idx[select_for_learning_large]
+        ]
 
         loss = predicted_rewards - goal
 
@@ -182,7 +196,7 @@ for episode_nr in range(episodes_count):
         optimizer.step()
         
         total_loss += loss.item()
-        steps += network_input.shape[0]
+        steps += selected_network_input.shape[0]
 
 
     avg_loss = total_loss / steps
