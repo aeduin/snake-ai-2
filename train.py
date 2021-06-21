@@ -199,7 +199,7 @@ for episode_nr in range(episodes_count):
         steps += selected_network_input.shape[0]
 
 
-    avg_loss = total_loss / steps
+    avg_loss = None if steps == 0.0 else total_loss / steps
     print('loss =', avg_loss)
     losses.append(avg_loss)
 
