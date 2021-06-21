@@ -8,7 +8,7 @@ empty_channel = 3
 
 space_type = torch.int16
 
-initial_snake_size = 4
+initial_snake_size = 3
 
 class World():
     def __init__(self, width: int, height: int, num_worlds: int, device: torch.device):
