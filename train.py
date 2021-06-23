@@ -15,10 +15,12 @@ print('start time:', script_start)
 
 n_worlds = 128
 episodes_count = 1500
-learning_rate = 0.000001
+learning_rate = 0.000005
 world_width = 7
 world_height = 7
-max_steps = 5_000
+max_steps = 5_00
+reward_decrease_factor = 0.96
+n_train_episodes = 10
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
@@ -109,7 +111,7 @@ for episode_nr in range(episodes_count):
             
             # actions_weight[alive] = predicted_rewards
             actions_weight[alive] = torch.softmax(predicted_rewards, dim=1)
-            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.01
+            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.03
 
 
             # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
@@ -154,7 +156,6 @@ for episode_nr in range(episodes_count):
     goals = [torch.zeros(0)] * (len(experience)) + [torch.zeros(n_worlds, dtype=torch.float, device=device)]
     _, alive_end, reward_end, _, _ = experience[-1]
     reached_end = [torch.zeros(0)] * len(experience) + [alive_end]
-    reward_decrease_factor = 0.96
 
     for turn_nr in range(len(experience) - 1, -1, -1):
         _, alive, has_reward, _, _ = experience[turn_nr]
@@ -164,46 +165,47 @@ for episode_nr in range(episodes_count):
         # goals.append(goals[-1] * reward_decrease_factor + has_reward)
 
     # print(torch.sum(goals[0]) / n_worlds)
+    
+    for _ in range(n_train_episodes):
+        for i in range(len(experience)):
+            network_input, alive, reward, taken_action_idx, _ = experience[i]
+            # _, next_alive, _, _, max_predicted_next = experience[i + 1]
 
-    for i in range(len(experience)):
-        network_input, alive, reward, taken_action_idx, _ = experience[i]
-        # _, next_alive, _, _, max_predicted_next = experience[i + 1]
+            # next_reward = torch.zeros(n_worlds, device=device)
+            # next_reward[next_alive] = max_predicted_next
+            # next_reward = next_reward[alive]
+            # next_reward += reward[alive]
 
-        # next_reward = torch.zeros(n_worlds, device=device)
-        # next_reward[next_alive] = max_predicted_next
-        # next_reward = next_reward[alive]
-        # next_reward += reward[alive]
+            select_for_learning_large = torch.logical_and(torch.logical_not(reached_end[i]), alive)
+            if torch.sum(select_for_learning_large).item() == 0:
+                continue
+            select_for_learning_small = select_for_learning_large[alive]
+            selected_network_input = network_input[select_for_learning_small]
 
-        select_for_learning_large = torch.logical_and(torch.logical_not(reached_end[i]), alive)
-        if torch.sum(select_for_learning_large).item() == 0:
-            continue
-        select_for_learning_small = select_for_learning_large[alive]
-        selected_network_input = network_input[select_for_learning_small]
+            goal = goals[i][select_for_learning_large] # (goals[-(i + 1)][alive] > 0).to(torch.float)
 
-        goal = goals[i][select_for_learning_large] # (goals[-(i + 1)][alive] > 0).to(torch.float)
+            optimizer.zero_grad()
 
-        optimizer.zero_grad()
+            # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
+            predicted_rewards = model(selected_network_input)[
+                torch.arange(0, selected_network_input.shape[0]),
+                taken_action_idx[select_for_learning_large]
+            ]
 
-        # print(torch.arange(0, network_input.shape[0]), taken_action_idx)
-        predicted_rewards = model(selected_network_input)[
-            torch.arange(0, selected_network_input.shape[0]),
-            taken_action_idx[select_for_learning_large]
-        ]
+            loss = predicted_rewards - goal
 
-        loss = predicted_rewards - goal
+            loss = torch.sum(loss * loss)
+            loss.backward()
 
-        loss = torch.sum(loss * loss)
-        loss.backward()
-
-        optimizer.step()
-        
-        total_loss += loss.item()
-        steps += selected_network_input.shape[0]
+            optimizer.step()
+            
+            total_loss += loss.item()
+            steps += selected_network_input.shape[0]
 
 
-    avg_loss = None if steps == 0.0 else total_loss / steps
-    print('loss =', avg_loss)
-    losses.append(avg_loss)
+        avg_loss = None if steps == 0.0 else total_loss / steps
+        print('loss =', avg_loss)
+        losses.append(avg_loss)
 
     if (episode_nr + 1) % 10 == 0:
         now = datetime.datetime.now()
