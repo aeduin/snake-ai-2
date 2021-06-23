@@ -60,7 +60,9 @@ for episode_nr in range(episodes_count):
     with torch.no_grad():
         while not torch.all(world.dead).cpu():
             alive = torch.logical_not(world.dead)
-            network_input = world.space.to(torch.float)[alive]
+            network_input = torch.zeros(n_worlds, simulation.num_channels + 1, world.width + 6, world.height + 6, device=device)[alive]
+            network_input[:, simulation.num_channels] = 1
+            network_input[:, :-1, 3:-3, 3:-3] = world.space.to(torch.float)[alive]
             predicted_rewards = model(network_input)
 
             rewards_transpose = predicted_rewards.transpose(1, 0)

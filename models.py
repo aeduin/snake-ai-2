@@ -17,9 +17,9 @@ class CnnAi(nn.Module):
 
         hidden_channels = 12
 
-        self.world_size = (world.width, world.height)
+        self.world_size = (world.width + 6, world.height + 6)
         size = torch.tensor(self.world_size)
-        self.conv1 = nn.Conv2d(simulation.num_channels, hidden_channels, (3, 3)).to(device)
+        self.conv1 = nn.Conv2d(simulation.num_channels + 1, hidden_channels, (3, 3)).to(device)
         size = (size - 2)
         self.conv2 = nn.Conv2d(hidden_channels, hidden_channels, (3, 3)).to(device)
         size = (size - 2)
