@@ -15,11 +15,13 @@ print('start time:', script_start)
 
 n_worlds = 128
 episodes_count = 1500
-learning_rate = 0.00005
+learning_rate = 0.00001
 world_width = 7
 world_height = 7
-max_steps = 5_00
+max_steps = 5_000
 reward_decrease_factor = 0.96
+max_reward_decrease_factor = 0.995
+reward_decrease_increaser = (max_reward_decrease_factor - reward_decrease_factor) / episodes_count * 3
 n_train_episodes = 1
 
 device = torch.device('cuda:0')
@@ -210,6 +212,8 @@ for episode_nr in range(episodes_count):
         avg_loss = None if steps == 0.0 else total_loss / steps
         print('loss =', avg_loss)
         losses.append(avg_loss)
+
+    reward_decrease_factor = min(reward_decrease_factor + reward_decrease_increaser, max_reward_decrease_factor)
 
     if (episode_nr + 1) % 10 == 0:
         now = datetime.datetime.now()
