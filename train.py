@@ -18,7 +18,7 @@ episodes_count = 1500
 learning_rate = 0.00005
 world_width = 7
 world_height = 7
-max_steps = 5_00
+max_steps = 5_000
 reward_decrease_factor = 0.96
 n_train_episodes = 1
 
