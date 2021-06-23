@@ -15,7 +15,7 @@ print('start time:', script_start)
 
 n_worlds = 128
 episodes_count = 1500
-learning_rate = 0.000001
+learning_rate = 0.00005
 world_width = 7
 world_height = 7
 max_steps = 5_000
@@ -109,7 +109,7 @@ for episode_nr in range(episodes_count):
             
             # actions_weight[alive] = predicted_rewards
             actions_weight[alive] = torch.softmax(predicted_rewards, dim=1)
-            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.01
+            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.025
 
 
             # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
@@ -140,6 +140,7 @@ for episode_nr in range(episodes_count):
 
             # print(len(experience), ':', torch.sum(world.dead))
 
+    learn_scale = 1000 / n_steps
     print('n_steps =', n_steps)
 
     avg_reward = total_reward.item() / world.num_worlds
@@ -193,7 +194,8 @@ for episode_nr in range(episodes_count):
         loss = predicted_rewards - goal
 
         loss = torch.sum(loss * loss)
-        loss.backward()
+        scaled_loss = loss * learn_scale
+        scaled_loss.backward()
 
         optimizer.step()
         
