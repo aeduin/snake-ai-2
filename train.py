@@ -3,7 +3,7 @@ from torch import nn
 
 import simulation
 from simulation import World
-from models import CnnAi
+from models import CnnAi, EquivariantAi
 
 import datetime
 import os
@@ -20,13 +20,14 @@ world_width = 7
 world_height = 7
 max_steps = 5_000
 reward_decrease_factor = 0.96
-max_reward_decrease_factor = 0.995
-reward_decrease_increaser = (max_reward_decrease_factor - reward_decrease_factor) / episodes_count * 3
+# max_reward_decrease_factor = 0.995
+# reward_decrease_increaser = (max_reward_decrease_factor - reward_decrease_factor) / episodes_count * 3
 n_train_episodes = 1
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
-model = CnnAi(world)
+# model = CnnAi(world)
+model = EquivariantAi(world)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -62,7 +63,7 @@ for episode_nr in range(episodes_count):
     n_steps = 0
 
     with torch.no_grad():
-        while not torch.all(world.dead).cpu():
+        while not torch.all(world.dead).item():
             alive = torch.logical_not(world.dead)
             network_input = torch.zeros(n_worlds, simulation.num_channels + 1, world.width + 6, world.height + 6, device=device)[alive]
             network_input[:, simulation.num_channels] = 1
@@ -213,7 +214,7 @@ for episode_nr in range(episodes_count):
         print('loss =', avg_loss)
         losses.append(avg_loss)
 
-    reward_decrease_factor = min(reward_decrease_factor + reward_decrease_increaser, max_reward_decrease_factor)
+    # reward_decrease_factor = min(reward_decrease_factor + reward_decrease_increaser, max_reward_decrease_factor)
 
     if (episode_nr + 1) % 10 == 0:
         now = datetime.datetime.now()

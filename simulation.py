@@ -24,7 +24,7 @@ class World():
 
         center_x = width // 2
         center_y = width // 2
-        self.snake_head_x = torch.tensor([center_x - 1]).to(device, torch.long).repeat(num_worlds)
+        self.snake_head_x = torch.tensor([center_x]).to(device, torch.long).repeat(num_worlds)
         self.snake_head_y = torch.tensor([center_y]).to(device, torch.long).repeat(num_worlds)
         self.snake_size = torch.tensor([initial_snake_size]).to(device, torch.long).repeat(num_worlds)
         self.dead = torch.tensor([False]).to(device, torch.bool).repeat(num_worlds)
@@ -37,7 +37,9 @@ class World():
         # self.space[:, snake_channel, self.snake_head_x, self.snake_head_y + 1] = 1
         # self.place_food(1)
 
-        self.space[:, food_channel, center_x + 3, center_y] = 1
+        # self.space[:, food_channel, center_x + 3, center_y] = 1
+        self.place_food(torch.ones(num_worlds, dtype=torch.bool, device=device))
+
 
     def step(self, move_x: torch.Tensor, move_y: torch.Tensor):
         # Calculate the new position of the head

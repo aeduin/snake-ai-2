@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     world = World(world_width, world_height, n_worlds, device)
     model = CnnAi(world)
-    model.load_state_dict(torch.load('./model_output/model_2021-06-23 10:31:23_1459'))
+    model.load_state_dict(torch.load('./model_output/model_2021-06-23 12:43:35_1499'))
     model.temperature = 0.001
 
     model.eval()
@@ -20,6 +20,9 @@ if __name__ == "__main__":
     print('start evaluation')
 
     with torch.no_grad():
+        print(world)
+        input()
+
         while not torch.all(world.dead).cpu():
             alive = torch.logical_not(world.dead)
             network_input = torch.zeros(n_worlds, simulation.num_channels + 1, world.width + 6, world.height + 6, device=device)[alive]
