@@ -170,7 +170,7 @@ class EquivariantAi(nn.Module):
 
 class PerfectAi(nn.Module):
     def __init__(self, world: World):
-        super(EquivariantAi, self).__init__()
+        super(PerfectAi, self).__init__()
 
         self.temperature = 0.03
         device = world.device

@@ -34,8 +34,8 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
-model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
-optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
+# model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
+# optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
 
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)
@@ -55,6 +55,7 @@ def running_avg(ls):
     return result
 
 for episode_nr in range(episodes_count):
+    print()
     print('start episode', episode_nr)
     world = World(world_width, world_height, n_worlds, device)
 
@@ -155,8 +156,10 @@ for episode_nr in range(episodes_count):
     
     max_reward = torch.max(total_reward, 0).values.item()
     avg_reward = torch.sum(total_reward).item() / world.num_worlds
+    n_perfect = torch.sum(total_reward == 45).item()
     print('\tmax reward:', max_reward)
     print('\tavg reward:', avg_reward)
+    print('\tperfect plays:', n_perfect)
     rewards.append(avg_reward)
 
     model.train()
