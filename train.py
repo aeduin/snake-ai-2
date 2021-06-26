@@ -70,6 +70,7 @@ for episode_nr in range(episodes_count):
             network_input[:, simulation.num_channels] = 1
             network_input[:, :-1, 3:-3, 3:-3] = world.space.to(torch.float)[alive]
             predicted_rewards = model(network_input)
+            # predicted_rewards = torch.zeros(n_worlds, 4, device=device)[alive]
 
             rewards_transpose = predicted_rewards.transpose(1, 0)
             
@@ -159,7 +160,7 @@ for episode_nr in range(episodes_count):
     steps = 0
 
     goals = [torch.zeros(0)] * (len(experience)) + [torch.zeros(n_worlds, dtype=torch.float, device=device)]
-    _, alive_end, reward_end, _, _ = experience[-1]
+    alive_end = torch.logical_not(world.dead)
     reached_end = [torch.zeros(0)] * len(experience) + [alive_end]
 
     for turn_nr in range(len(experience) - 1, -1, -1):
