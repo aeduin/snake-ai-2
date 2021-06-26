@@ -3,7 +3,7 @@ from torch import nn
 
 import simulation
 from simulation import World
-from models import CnnAi, EquivariantAi, LinearAi
+from models import CnnAi, EquivariantAi, LinearAi, PerfectAi
 
 import datetime
 import os
@@ -28,7 +28,7 @@ device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
 # model = CnnAi(world)
 # model = EquivariantAi(world)
-model = LinearAi(world)
+model = PerfectAi(world)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
