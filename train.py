@@ -34,6 +34,9 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
+model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
+optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
+
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)
 os.makedirs('./model_output/', exist_ok=True)
@@ -59,7 +62,7 @@ for episode_nr in range(episodes_count):
 
     model.eval()
 
-    total_reward = torch.tensor([0], device=device)
+    total_reward = torch.zeros(n_worlds, device=device)
 
     n_steps = 0
 
@@ -131,7 +134,7 @@ for episode_nr in range(episodes_count):
 
             reward = world.step(dx, dy)
 
-            total_reward += torch.sum(reward)
+            total_reward += reward
             
             n_steps += 1
 
@@ -148,8 +151,10 @@ for episode_nr in range(episodes_count):
 
     learn_scale = 1000 / n_steps
     print('n_steps =', n_steps)
-
-    avg_reward = total_reward.item() / world.num_worlds
+    
+    max_reward = torch.max(total_reward, 0).values.item()
+    avg_reward = torch.sum(total_reward).item() / world.num_worlds
+    print('\tmax reward:', max_reward)
     print('\tavg reward:', avg_reward)
     rewards.append(avg_reward)
 
