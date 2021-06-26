@@ -8,6 +8,56 @@ import numpy as np
 from typing import Tuple
 from groupy.gconv.pytorch_gconv import P4MConvZ2, P4MConvP4M
 
+class LinearAi(nn.Module):
+    def __init__(self, world: World):
+        super(LinearAi, self).__init__()
+
+        self.temperature = 0.03
+        device = world.device
+
+        hidden_channels = 12
+
+        self.world_size = (world.width + 6, world.height + 6)
+
+        input_size = self.world_size[0] * self.world_size[1] * (simulation.num_channels + 1)
+
+        hidden_size = 1_000
+        output_size = 4
+
+        self.dense1 = nn.Linear(input_size, hidden_size)
+        self.dense2 = nn.Linear(hidden_size, hidden_size)
+        self.dense3 = nn.Linear(hidden_size, hidden_size)
+        self.dense4 = nn.Linear(hidden_size, output_size)
+
+        self.relu = nn.ReLU()
+        self.softmax = nn.Softmax(dim=1)
+        self.sigmoid = nn.Sigmoid()
+         
+        self.actions_cpu = [(0, 1), (-1, 0), (0, -1), (1, 0)]
+        self.actions = torch.Tensor(self.actions_cpu).to(device, torch.long)
+
+        self.actions_x = torch.tensor([x for x, _ in self.actions_cpu], device=device, dtype=torch.long)
+        self.actions_y = torch.tensor([y for _, y in self.actions_cpu], device=device, dtype=torch.long)
+
+    def forward(self, x):
+        y = x
+        
+        y = y.view(y.shape[0], -1)
+
+        y = self.dense1(y)
+        y = self.relu(y)
+        
+        y = self.dense2(y)
+        y = self.relu(y)
+        
+        y = self.dense3(y)
+        y = self.relu(y)
+
+        y = self.dense4(y)
+        y = self.relu(y)
+
+        return y
+
 class CnnAi(nn.Module):
     def __init__(self, world: World):
         super(CnnAi, self).__init__()
@@ -39,8 +89,6 @@ class CnnAi(nn.Module):
         self.actions_x = torch.tensor([x for x, _ in self.actions_cpu], device=device, dtype=torch.long)
         self.actions_y = torch.tensor([y for _, y in self.actions_cpu], device=device, dtype=torch.long)
 
-        self.old_network_input = None
-
     def forward(self, x):
         y = x
         
@@ -70,7 +118,7 @@ class EquivariantAi(nn.Module):
         device = world.device
         
 
-        hidden_channels = 12
+        hidden_channels = 4
         groups_count = 8
 
         self.world_size = (world.width + 6, world.height + 6)
@@ -93,8 +141,6 @@ class EquivariantAi(nn.Module):
 
         self.actions_x = torch.tensor([x for x, _ in self.actions_cpu], device=device, dtype=torch.long)
         self.actions_y = torch.tensor([y for _, y in self.actions_cpu], device=device, dtype=torch.long)
-
-        self.old_network_input = None
 
     def forward(self, x):
         y = x
