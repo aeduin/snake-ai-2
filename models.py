@@ -24,10 +24,10 @@ class LinearAi(nn.Module):
         hidden_size = 1_000
         output_size = 4
 
-        self.dense1 = nn.Linear(input_size, hidden_size)
-        self.dense2 = nn.Linear(hidden_size, hidden_size)
-        self.dense3 = nn.Linear(hidden_size, hidden_size)
-        self.dense4 = nn.Linear(hidden_size, output_size)
+        self.dense1 = nn.Linear(input_size, hidden_size).to(device)
+        self.dense2 = nn.Linear(hidden_size, hidden_size).to(device)
+        self.dense3 = nn.Linear(hidden_size, hidden_size).to(device)
+        self.dense4 = nn.Linear(hidden_size, output_size).to(device)
 
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
