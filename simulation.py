@@ -104,6 +104,9 @@ class World():
         self.snake_head_x = new_head_x
         self.snake_head_y = new_head_y
 
+        snake_length = torch.sum(self.space[:, snake_channel, :, :] > 0, dim=[1, 2])
+        self.dead = torch.logical_or(self.dead, snake_length >= self.width * self.height - 1)
+
         return eat_food
 
     def place_food(self, new_food_required):
