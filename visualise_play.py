@@ -1,18 +1,21 @@
 import torch
 import simulation
 from simulation import World
-from models import CnnAi
+from models import CnnAi, EquivariantAi
+from time import sleep
 
 world_width = 7
 world_height = 7
 n_worlds = 1
 
+def wait(): sleep(0.3)
+
 if __name__ == "__main__":
     device = torch.device('cuda:0')
 
     world = World(world_width, world_height, n_worlds, device)
-    model = CnnAi(world)
-    model.load_state_dict(torch.load('./model_output/model_2021-06-23 12:43:35_1499'))
+    model = EquivariantAi(world)
+    model.load_state_dict(torch.load('./model_output/model_2021-06-25 15:53:43_1499'))
     model.temperature = 0.001
 
     model.eval()
@@ -21,7 +24,7 @@ if __name__ == "__main__":
 
     with torch.no_grad():
         print(world)
-        input()
+        wait()
 
         while not torch.all(world.dead).cpu():
             alive = torch.logical_not(world.dead)
@@ -90,4 +93,5 @@ if __name__ == "__main__":
 
             world.step(dx, dy)
             print(world)
-            input()
+            # input()
+            wait()
