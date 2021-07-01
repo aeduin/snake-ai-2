@@ -172,7 +172,7 @@ class PerfectAi(nn.Module):
     def __init__(self, world: World):
         super(PerfectAi, self).__init__()
 
-        self.temperature = 0.03
+        self.temperature = 0.01
         device = world.device
         
 

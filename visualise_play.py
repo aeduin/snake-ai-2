@@ -1,7 +1,7 @@
 import torch
 import simulation
 from simulation import World
-from models import CnnAi, EquivariantAi
+from models import CnnAi, EquivariantAi, LinearAi, PerfectAi
 from time import sleep
 
 world_width = 7
@@ -14,8 +14,8 @@ if __name__ == "__main__":
     device = torch.device('cuda:0')
 
     world = World(world_width, world_height, n_worlds, device)
-    model = EquivariantAi(world)
-    model.load_state_dict(torch.load('./model_output/model_2021-06-25 15:53:43_1499'))
+    model = PerfectAi(world)
+    model.load_state_dict(torch.load('./model_output/model_2021-06-26 16:35:50_1489'))
     model.temperature = 0.001
 
     model.eval()

@@ -34,8 +34,8 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
-# model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
-# optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
+model.load_state_dict(torch.load('./model_output/model_2021-06-26 16:31:43_19'))
+optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 16:31:43_19'))
 
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)
@@ -120,7 +120,7 @@ for episode_nr in range(episodes_count):
             
             # actions_weight[alive] = predicted_rewards
             actions_weight[alive] = torch.softmax(predicted_rewards, dim=1)
-            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.03
+            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.01
 
 
             # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
@@ -243,8 +243,8 @@ for episode_nr in range(episodes_count):
         plt.savefig('graph_output/avg_loss_' + script_start)
         plt.clf()
 
-        if episode_nr < 72:
-            lr_scheduler.step()
+        # if episode_nr < 72:
+            # lr_scheduler.step()
 
         
 
