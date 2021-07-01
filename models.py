@@ -15,9 +15,7 @@ class LinearAi(nn.Module):
         self.temperature = 0.03
         device = world.device
 
-        hidden_channels = 12
-
-        self.world_size = (world.width + 6, world.height + 6)
+        self.world_size = (world.width, world.height)
 
         input_size = self.world_size[0] * self.world_size[1] * (simulation.num_channels + 1)
 
@@ -118,7 +116,7 @@ class EquivariantAi(nn.Module):
         device = world.device
         
 
-        hidden_channels = 4
+        hidden_channels = 6
         groups_count = 8
 
         self.world_size = (world.width + 6, world.height + 6)
