@@ -10,12 +10,15 @@ import os
 
 from matplotlib import pyplot as plt
 
-script_start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+script_start = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 print('start time:', script_start)
 
-n_worlds = 128
-episodes_count = 1500
+n_worlds = 256
+episodes_count = 1000
 learning_rate = 0.00001
+random_action_probability = 0.03
+random_weight_sd = 0.03
+
 world_width = 7
 world_height = 7
 max_steps = 5_000
@@ -27,21 +30,24 @@ n_train_episodes = 1
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
 # model = CnnAi(world)
-# model = EquivariantAi(world)
-model = LinearAi(world)
+model = EquivariantAi(world)
+# model = LinearAi(world)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
+# lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
-model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
-optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
+# model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
+# optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
 
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)
 os.makedirs('./model_output/', exist_ok=True)
 losses = []
 rewards = []
+
+best_model_score = 0
+best_episode = -1
 
 def running_avg(ls):
     result = []
@@ -119,11 +125,10 @@ for episode_nr in range(episodes_count):
             
             # actions_weight[alive] = predicted_rewards
             actions_weight[alive] = torch.softmax(predicted_rewards, dim=1)
-            actions_weight += torch.randn(world.num_worlds, 4, device=device) * 0.03
-
+            actions_weight += torch.randn(world.num_worlds, 4, device=device) * random_weight_sd
 
             # actions_weight += torch.randn(4, world.num_worlds, device=device) * model.temperature
-            randomize = torch.rand(world.num_worlds, device=device) < model.temperature
+            randomize = torch.rand(world.num_worlds, device=device) < random_action_probability
             actions_weight[randomize] = torch.rand(world.num_worlds, 4, device=device)[randomize]
             actions_weight[impossible_large] = -100
 
@@ -158,6 +163,19 @@ for episode_nr in range(episodes_count):
     print('\tmax reward:', max_reward)
     print('\tavg reward:', avg_reward)
     rewards.append(avg_reward)
+
+    if avg_reward > best_model_score:
+        best_model_score = avg_reward
+        best_episode = episode_nr
+        print('new best model in episode', best_episode, 'with score', best_model_score)
+        torch.save(
+            model.state_dict(),
+            "model_output/best_model_" + script_start + "_" + str(episode_nr)
+        )
+        torch.save(
+            optimizer.state_dict(),
+            "model_output/best_optim_" + script_start + "_" + str(episode_nr)
+        )
 
     model.train()
 
@@ -224,9 +242,9 @@ for episode_nr in range(episodes_count):
     # reward_decrease_factor = min(reward_decrease_factor + reward_decrease_increaser, max_reward_decrease_factor)
 
     if (episode_nr + 1) % 10 == 0:
-        now = datetime.datetime.now()
-        torch.save(model.state_dict(), 'model_output/model_' + script_start + '_'  + str(episode_nr))
-        torch.save(optimizer.state_dict(), 'model_output/optimizer_' + script_start + '_'  + str(episode_nr))
+        # now = datetime.datetime.now()
+        # torch.save(model.state_dict(), 'model_output/model_' + script_start + '_'  + str(episode_nr))
+        # torch.save(optimizer.state_dict(), 'model_output/optimizer_' + script_start + '_'  + str(episode_nr))
 
         plt.plot(rewards)
         plt.plot(running_avg(rewards))
@@ -240,10 +258,17 @@ for episode_nr in range(episodes_count):
         plt.savefig('graph_output/avg_loss_' + script_start)
         plt.clf()
 
-        if episode_nr < 72:
-            lr_scheduler.step()
-
+        # if episode_nr < 72:
+            # lr_scheduler.step()
         
+        torch.save(
+            model.state_dict(),
+            "model_output/last_model_" + script_start
+        )
+        torch.save(
+            optimizer.state_dict(),
+            "model_output/last_optim_" + script_start
+        )
 
 
 

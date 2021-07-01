@@ -129,7 +129,7 @@ class EquivariantAi(nn.Module):
         size = (size - 2)
         self.conv3 = P4MConvP4M(in_channels=hidden_channels, out_channels=hidden_channels, kernel_size=3, stride=1, padding=0).to(device)
         size = (size - 2)
-        self.dense = nn.Linear(int(size[0] * size[1] * hidden_channels * groups_count), 4).to(device)
+        self.dense = nn.Linear(int(size[0] * size[1] * hidden_channels * 1), 1).to(device)
 
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
@@ -141,6 +141,8 @@ class EquivariantAi(nn.Module):
 
         self.actions_x = torch.tensor([x for x, _ in self.actions_cpu], device=device, dtype=torch.long)
         self.actions_y = torch.tensor([y for _, y in self.actions_cpu], device=device, dtype=torch.long)
+
+        self.device = device
 
     def forward(self, x):
         y = x
@@ -158,11 +160,34 @@ class EquivariantAi(nn.Module):
         y = self.relu(y)
         # print(y.shape)
 
-        y = y.view(y.shape[0], -1)
+        # y = y.view(y.shape[0], -1)
         
-        y = self.dense(y)
+        # y = self.dense(y)
         # y = self.softmax(y)
         # y = self.sigmoid(y)
-        y = self.relu(y)
+        # y = self.relu(y)
 
-        return y
+        result = torch.zeros((y.shape[0], 4), device=self.device)
+        # print(y.shape)
+        # print(result.shape)
+
+        for action_id in range(4):
+            
+            result[:, action_id] = self.dense(self.to_linear_space(
+                y[:, :, action_id, :, :],
+                action_id
+            ))[:, 0]
+            result[:, action_id] += self.dense(self.to_linear_space(
+                y[:, :, action_id + 4, :, :],
+                action_id
+            ))[:, 0]
+
+
+        return self.relu(result)
+
+    def to_linear_space(self, convnet_space, action_idx):
+        return torch.flatten(
+            torch.rot90(convnet_space, k=action_idx, dims=(2, 3)),
+            start_dim=1,
+            end_dim=-1
+        )
