@@ -29,8 +29,9 @@ n_train_episodes = 1
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
-# model = CnnAi(world)
-model = EquivariantAi(world)
+model_name = 'cnn'
+model = CnnAi(world)
+# model = EquivariantAi(world)
 # model = LinearAi(world)
 
 criterion = nn.MSELoss()
@@ -170,11 +171,11 @@ for episode_nr in range(episodes_count):
         print('new best model in episode', best_episode, 'with score', best_model_score)
         torch.save(
             model.state_dict(),
-            "model_output/best_model_" + script_start + "_" + str(episode_nr)
+            "model_output/best_model_" + model_name + "_" + script_start + "_" + str(episode_nr)
         )
         torch.save(
             optimizer.state_dict(),
-            "model_output/best_optim_" + script_start + "_" + str(episode_nr)
+            "model_output/best_optim_" + model_name + "_" + script_start + "_" + str(episode_nr)
         )
 
     model.train()
@@ -263,11 +264,11 @@ for episode_nr in range(episodes_count):
         
         torch.save(
             model.state_dict(),
-            "model_output/last_model_" + script_start
+            "model_output/last_model_" + model_name + "_" + script_start
         )
         torch.save(
             optimizer.state_dict(),
-            "model_output/last_optim_" + script_start
+            "model_output/last_optim_" + model_name + "_" + script_start
         )
 
 

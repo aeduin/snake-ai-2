@@ -1,10 +1,9 @@
 import torch
 
-num_channels = 4
+num_channels = 3
 snake_channel = 0
 snake_head_channel = 1
 food_channel = 2
-empty_channel = 3
 
 space_type = torch.int16
 
