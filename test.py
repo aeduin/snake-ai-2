@@ -7,6 +7,7 @@ w = simulation.World(7, 7, 1, device)
 n_worlds = 1
 
 model = models.EquivariantAi(w)
+model.load_state_dict(torch.load('./model_output/best_model_2021-07-01_12:10:17_995'))
 
 w.step(torch.tensor([0]), torch.tensor([1]))
 w.step(torch.tensor([0]), torch.tensor([1]))
