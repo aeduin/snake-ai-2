@@ -171,23 +171,29 @@ class EquivariantAi(nn.Module):
 
         for action_id in range(4):
             if True:
-                result[:, 3 - action_id] += self.dense(self.to_linear_space(
+                result[:, (4 - action_id) % 4] += self.dense(self.to_linear_space(
                     y[:, :, action_id, :, :],
                     action_id,
+                    False
                 ))[:, 0]
             if True:
                 result[:, action_id] += self.dense(self.to_linear_space(
                     y[:, :, action_id + 4, :, :],
                     4 - action_id,
+                    True
                 ))[:, 0]
 
 
         return self.relu(result)
 
-    def to_linear_space(self, convnet_space, num_rotations):
+    def to_linear_space(self, convnet_space, num_rotations, flip):
         space = convnet_space
 
         space = torch.rot90(convnet_space, k=4-num_rotations, dims=(2, 3))
+        
+        if flip:
+            space = torch.flip(space, dims=[2])
+
 
         space = torch.flatten( 
             space,
