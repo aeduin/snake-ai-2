@@ -29,10 +29,16 @@ n_train_episodes = 1
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
-model_name = 'cnn'
-model = CnnAi(world)
-# model = EquivariantAi(world)
-# model = LinearAi(world)
+model_name = 'eqv'
+
+if model_name == 'cnn':
+    model = CnnAi(world)
+elif model_name == 'eqv':
+    model = EquivariantAi(world)
+elif model_name == 'lin':
+    model = LinearAi(world)
+else:
+    raise Exception('Invalid model name')
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
