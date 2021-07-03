@@ -21,3 +21,5 @@ network_input[:, :-1, 3:-3, 3:-3] = w.space.to(torch.float)[alive]
 for rotations in range(4):
     prediction = model(torch.rot90(network_input, rotations, (2, 3)))
     print(prediction)
+
+    print(model.actions_cpu[torch.argmax(prediction).item()])
