@@ -85,6 +85,7 @@ for episode_nr in range(episodes_count):
             network_input = torch.zeros(n_worlds, simulation.num_channels + 1, world.width + 6, world.height + 6, device=device)[alive]
             network_input[:, simulation.num_channels] = 1
             network_input[:, :-1, 3:-3, 3:-3] = world.space.to(torch.float)[alive]
+            network_input[:, -1, 3:-3, 3:-3] = 0
             predicted_rewards = model(network_input)
             # predicted_rewards = torch.zeros(n_worlds, 4, device=device)[alive]
 
