@@ -15,7 +15,8 @@ if __name__ == "__main__":
 
     world = World(world_width, world_height, n_worlds, device)
     model = PerfectAi(world)
-    model.load_state_dict(torch.load('./model_output/model_2021-06-26 16:35:50_1489'))
+    # model.load_state_dict(torch.load('./model_output/model_2021-06-26 16:35:50_1489'))
+    model.load_state_dict(torch.load('./model_output/perfect_model_1489'))
     model.temperature = 0.001
 
     model.eval()
