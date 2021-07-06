@@ -19,7 +19,7 @@ class LinearAi(nn.Module):
 
         input_size = self.world_size[0] * self.world_size[1] * (simulation.num_channels)
 
-        hidden_size = 588
+        hidden_size = 50
         output_size = 4
 
         self.dense1 = nn.Linear(input_size, hidden_size).to(device)
