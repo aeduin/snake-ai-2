@@ -29,7 +29,7 @@ n_train_episodes = 1
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
-model_name = 'eqv'
+model_name = 'lin'
 
 if model_name == 'cnn':
     model = CnnAi(world)

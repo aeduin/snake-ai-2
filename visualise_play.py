@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     world = World(world_width, world_height, n_worlds, device)
     model = EquivariantAi(world)
-    model.load_state_dict(torch.load('./model_output/model_2021-06-25 15:53:43_1499'))
+    model.load_state_dict(torch.load('./model_output/best_model_eqv_2021-07-05_07:19:34_983'))
     model.temperature = 0.001
 
     model.eval()
@@ -31,6 +31,7 @@ if __name__ == "__main__":
             network_input = torch.zeros(n_worlds, simulation.num_channels + 1, world.width + 6, world.height + 6, device=device)[alive]
             network_input[:, simulation.num_channels] = 1
             network_input[:, :-1, 3:-3, 3:-3] = world.space.to(torch.float)[alive]
+            network_input[:, -1, 3:-3, 3:-3] = 0
             predicted_rewards = model(network_input)
 
             rewards_transpose = predicted_rewards.transpose(1, 0)

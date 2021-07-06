@@ -17,9 +17,9 @@ class LinearAi(nn.Module):
 
         self.world_size = (world.width, world.height)
 
-        input_size = self.world_size[0] * self.world_size[1] * (simulation.num_channels + 1)
+        input_size = self.world_size[0] * self.world_size[1] * (simulation.num_channels)
 
-        hidden_size = 1_000
+        hidden_size = 588
         output_size = 4
 
         self.dense1 = nn.Linear(input_size, hidden_size).to(device)
@@ -38,9 +38,9 @@ class LinearAi(nn.Module):
         self.actions_y = torch.tensor([y for _, y in self.actions_cpu], device=device, dtype=torch.long)
 
     def forward(self, x):
-        y = x
+        y = x[:, :-1, 3: -3, 3: -3]
         
-        y = y.view(y.shape[0], -1)
+        y = torch.flatten(y, start_dim=1, end_dim=-1)
 
         y = self.dense1(y)
         y = self.relu(y)
