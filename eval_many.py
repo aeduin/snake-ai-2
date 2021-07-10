@@ -4,6 +4,8 @@ import simulation
 from simulation import World
 import models
 
+import sys
+
 random_action_probability = 0.03
 random_weight_sd = 0.03
 
@@ -16,7 +18,14 @@ max_steps = 5_000
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
 
-model_name = 'lin'
+file_name = sys.argv[1]
+print(file_name)
+
+model_name = ''
+# model_name = 'lin'
+for name in ['lin', 'eqv', 'cnn']:
+    if name in file_name:
+        model_name = name
 
 if model_name == 'cnn':
     model = models.CnnAi(world)
@@ -27,7 +36,7 @@ elif model_name == 'lin':
 else:
     raise Exception('Invalid model name')
 
-model.load_state_dict(torch.load('./model_output/best_model_lin_2021-07-06_12:52:52_200'))
+model.load_state_dict(torch.load(file_name))
 model.eval()
 
 total_reward = torch.zeros(n_worlds, device=device)

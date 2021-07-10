@@ -1,0 +1,144 @@
+model_output/best_model_cnn_2021-07-06_11:20:06_94
+n_steps = 667
+avg_reward=11.08837890625
+max_reward=26.0
+model_output/best_model_cnn_2021-07-06_09:28:42_98
+n_steps = 659
+avg_reward=11.41748046875
+max_reward=27.0
+model_output/best_model_cnn_2021-07-04_20:53:37_75
+n_steps = 787
+avg_reward=12.37353515625
+max_reward=34.0
+model_output/best_model_cnn_2021-07-04_18:36:59_96
+n_steps = 618
+avg_reward=11.5048828125
+max_reward=26.0
+model_output/best_model_cnn_2021-07-04_17:00:31_99
+n_steps = 621
+avg_reward=11.943359375
+max_reward=29.0
+model_output/best_model_cnn_2021-07-04_15:09:29_62
+n_steps = 1113
+avg_reward=12.7255859375
+max_reward=34.0
+model_output/best_model_eqv_2021-07-05_21:16:22_92
+n_steps = 973
+avg_reward=11.4130859375
+max_reward=21.0
+model_output/best_model_eqv_2021-07-05_16:16:53_95
+n_steps = 669
+avg_reward=15.61767578125
+max_reward=33.0
+model_output/best_model_eqv_2021-07-05_11:48:34_99
+n_steps = 657
+avg_reward=10.8935546875
+max_reward=25.0
+model_output/best_model_eqv_2021-07-05_07:19:34_99
+n_steps = 660
+avg_reward=12.28857421875
+max_reward=26.0
+model_output/best_model_eqv_2021-07-05_02:35:15_85
+n_steps = 665
+avg_reward=12.451171875
+max_reward=27.0
+model_output/best_model_eqv_2021-07-04_23:32:55_91
+n_steps = 798
+avg_reward=13.60888671875
+max_reward=27.0
+model_output/best_model_lin_2021-07-07_15:53:02_99
+n_steps = 894
+avg_reward=6.15478515625
+max_reward=18.0
+model_output/best_model_lin_2021-07-07_13:50:18_99
+n_steps = 1031
+avg_reward=10.6103515625
+max_reward=28.0
+model_output/best_model_lin_2021-07-06_16:13:54_92
+n_steps = 1498
+avg_reward=5.4716796875
+max_reward=15.0
+model_output/best_model_lin_2021-07-08_22:02:48_96
+n_steps = 738
+avg_reward=5.96630859375
+max_reward=16.0
+model_output/best_model_lin_2021-07-08_09:23:00_67
+n_steps = 1340
+avg_reward=5.853515625
+max_reward=16.0
+model_output/best_model_lin_2021-07-08_20:06:20_97
+n_steps = 498
+avg_reward=9.21875
+max_reward=17.0
+model_output/best_model_cnn_2021-07-06_11:20:06_868
+n_steps = 772
+avg_reward=15.927734375
+max_reward=34.0
+model_output/best_model_cnn_2021-07-06_09:28:42_992
+n_steps = 799
+avg_reward=19.4091796875
+max_reward=43.0
+model_output/best_model_cnn_2021-07-04_20:53:37_973
+n_steps = 1172
+avg_reward=16.7841796875
+max_reward=45.0
+model_output/best_model_cnn_2021-07-04_18:36:59_994
+n_steps = 1427
+avg_reward=16.62744140625
+max_reward=42.0
+model_output/best_model_cnn_2021-07-04_17:00:31_994
+n_steps = 659
+avg_reward=16.1923828125
+max_reward=33.0
+model_output/best_model_cnn_2021-07-04_15:09:29_983
+n_steps = 495
+avg_reward=15.77197265625
+max_reward=40.0
+model_output/best_model_eqv_2021-07-05_21:16:22_939
+n_steps = 1131
+avg_reward=26.58935546875
+max_reward=45.0
+model_output/best_model_eqv_2021-07-05_16:16:53_862
+n_steps = 1831
+avg_reward=28.77783203125
+max_reward=45.0
+model_output/best_model_eqv_2021-07-05_11:48:34_978
+n_steps = 624
+avg_reward=26.37744140625
+max_reward=45.0
+model_output/best_model_eqv_2021-07-05_07:19:34_983
+n_steps = 2530
+avg_reward=24.47900390625
+max_reward=45.0
+model_output/best_model_eqv_2021-07-05_02:35:15_979
+n_steps = 806
+avg_reward=22.07177734375
+max_reward=45.0
+model_output/best_model_eqv_2021-07-04_23:32:55_941
+n_steps = 591
+avg_reward=17.98095703125
+max_reward=35.0
+model_output/best_model_lin_2021-07-07_15:53:02_923
+n_steps = 509
+avg_reward=15.68798828125
+max_reward=34.0
+model_output/best_model_lin_2021-07-07_13:50:18_997
+n_steps = 582
+avg_reward=14.43115234375
+max_reward=27.0
+model_output/best_model_lin_2021-07-06_16:13:54_971
+n_steps = 699
+avg_reward=16.67724609375
+max_reward=31.0
+model_output/best_model_lin_2021-07-08_22:04:41_140
+n_steps = 1138
+avg_reward=7.38916015625
+max_reward=19.0
+model_output/best_model_lin_2021-07-08_22:02:48_730
+n_steps = 695
+avg_reward=14.15380859375
+max_reward=26.0
+model_output/best_model_lin_2021-07-08_20:06:20_929
+n_steps = 819
+avg_reward=17.67626953125
+max_reward=34.0
