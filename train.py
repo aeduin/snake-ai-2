@@ -3,7 +3,7 @@ from torch import nn
 
 import simulation
 from simulation import World
-from models import CnnAi, EquivariantAi, LinearAi
+from models import CnnAi, EquivariantAi, LinearAi, LargeCnnAi
 
 import datetime
 import os
@@ -14,7 +14,7 @@ script_start = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 print('start time:', script_start)
 
 n_worlds = 256
-episodes_count = 1000
+episodes_count = 300
 learning_rate = 0.00001
 random_action_probability = 0.03
 random_weight_sd = 0.03
@@ -29,7 +29,7 @@ n_train_episodes = 1
 
 device = torch.device('cuda:0')
 world = World(world_width, world_height, n_worlds, device)
-model_name = 'lin'
+model_name = 'lcn'
 
 if model_name == 'cnn':
     model = CnnAi(world)
@@ -37,6 +37,8 @@ elif model_name == 'eqv':
     model = EquivariantAi(world)
 elif model_name == 'lin':
     model = LinearAi(world)
+elif model_name == 'lcn':
+    model = LargeCnnAi(world)
 else:
     raise Exception('Invalid model name')
 
@@ -44,8 +46,8 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 # lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
 
-# model.load_state_dict(torch.load('./model_output/model_2021-06-26 13:01:56_19'))
-# optimizer.load_state_dict(torch.load('./model_output/optimizer_2021-06-26 13:01:56_19'))
+# model.load_state_dict(torch.load('model_output/best_model_lin_2021-07-08_09:23:00_718'))
+# optimizer.load_state_dict(torch.load('model_output/best_optim_lin_2021-07-08_09:23:00_718'))
 
 plt.figure(0)
 os.makedirs('./graph_output/', exist_ok=True)

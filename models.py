@@ -107,6 +107,7 @@ class CnnAi(nn.Module):
         y = self.relu(y)
 
         return y
+
 class LargeCnnAi(nn.Module):
     def __init__(self, world: World):
         super(LargeCnnAi, self).__init__()
@@ -156,6 +157,8 @@ class LargeCnnAi(nn.Module):
         # y = self.softmax(y)
         # y = self.sigmoid(y)
         y = self.relu(y)
+
+        return y
 
 class EquivariantAi(nn.Module):
     def __init__(self, world: World):
