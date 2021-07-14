@@ -23,7 +23,7 @@ print(file_name)
 
 model_name = ''
 # model_name = 'lin'
-for name in ['lin', 'eqv', 'cnn']:
+for name in ['lin', 'eqv', 'cnn', 'lcn']:
     if name in file_name:
         model_name = name
 
@@ -33,6 +33,8 @@ elif model_name == 'eqv':
     model = models.EquivariantAi(world)
 elif model_name == 'lin':
     model = models.LinearAi(world)
+elif model_name == 'lcn':
+    model = models.LargeCnnAi(world)
 else:
     raise Exception('Invalid model name')
 

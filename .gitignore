@@ -2,4 +2,9 @@ __pycache__
 graph_output/
 model_output/
 
+tests.txt
+tests_compressed.txt
+tests_compressed2.txt
+eval.zsh
+
 .flake8

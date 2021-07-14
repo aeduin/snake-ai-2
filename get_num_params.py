@@ -18,5 +18,7 @@ if __name__ == "__main__":
     model = models.EquivariantAi(world)
     print('equivariant:', num_parameters(model))
 
+    model = models.LargeCnnAi(world)
+    print('large cnn:', num_parameters(model))
 
 
